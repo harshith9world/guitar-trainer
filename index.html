@@ -94,7 +94,13 @@
                 🎤 Enable Mic
 
             </button>
-
+            <button
+                id="openTunerBtn"
+                class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">
+                
+                🎸 Tuner
+            </button>
+            
         </div>
 
     </div>
@@ -116,7 +122,7 @@
                 C Maj
 
             </div>
-
+            
             <button
                 onclick="nextChord()"
                 class="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition font-semibold">
@@ -215,6 +221,101 @@
     </div>
 
 </div>
+/////////////////////////////////////////////////////////
+//Tuner
+////////////////////////////////////////////////////////
+
+<!-- TUNER MODAL -->
+<div
+    id="tunerModal"
+    class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+
+    <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-700 p-6 relative">
+
+        <!-- CLOSE -->
+        <button
+            id="closeTunerBtn"
+            class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">
+
+            ×
+
+        </button>
+
+        <h2 class="text-3xl font-black text-center mb-6 text-emerald-400">
+            Guitar Tuner
+        </h2>
+
+        <!-- NOTE -->
+        <div
+            id="tunerNote"
+            class="text-7xl font-black text-center text-white mb-2">
+
+            --
+
+        </div>
+
+        <!-- FREQ -->
+        <div
+            id="tunerFreq"
+            class="text-center text-gray-400 text-lg mb-6">
+
+            0 Hz
+
+        </div>
+
+        <!-- TARGET STRING -->
+        <div class="text-center mb-4">
+
+            <div class="text-gray-400 uppercase text-sm">
+                Closest String
+            </div>
+
+            <div
+                id="closestString"
+                class="text-3xl font-bold text-emerald-400">
+
+                --
+
+            </div>
+
+        </div>
+
+        <!-- TUNING STATUS -->
+        <div
+            id="tuningStatus"
+            class="text-center text-2xl font-bold text-yellow-400 mb-6">
+
+            Waiting...
+
+        </div>
+
+        <!-- TUNING BAR -->
+        <div class="w-full h-4 bg-slate-700 rounded-full overflow-hidden relative">
+
+            <div
+                id="tuningNeedle"
+                class="absolute top-0 left-1/2 w-2 h-4 bg-emerald-400 transition-all duration-100"
+                style="transform: translateX(-50%);">
+            </div>
+
+        </div>
+
+        <!-- STANDARD TUNING -->
+        <div class="grid grid-cols-6 gap-2 mt-8 text-center">
+
+            <div>E</div>
+            <div>A</div>
+            <div>D</div>
+            <div>G</div>
+            <div>B</div>
+            <div>E</div>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <script>
 
@@ -553,7 +654,7 @@ function detectPitch() {
 
         const note =
             frequencyToNote(pitch);
-
+            updateTuner(pitch, note);
         document.getElementById("detectedNoteDisplay")
             .innerText = note;
 
@@ -660,7 +761,150 @@ function nextChord() {
 
     drawFretboard(chordKeys[currentChordIndex]);
 }
+//////////////////////////////////////////////////////////
+// TUNER SYSTEM
+//////////////////////////////////////////////////////////
 
+const tunerModal =
+    document.getElementById("tunerModal");
+
+document.getElementById("openTunerBtn")
+    .addEventListener("click", () => {
+
+        tunerModal.classList.remove("hidden");
+
+        tunerModal.classList.add("flex");
+
+});
+
+document.getElementById("closeTunerBtn")
+    .addEventListener("click", () => {
+
+        tunerModal.classList.add("hidden");
+
+        tunerModal.classList.remove("flex");
+
+});
+
+//////////////////////////////////////////////////////////
+// STANDARD GUITAR TUNING
+//////////////////////////////////////////////////////////
+
+const guitarStrings = [
+
+    { note: "E", freq: 82.41 },
+    { note: "A", freq: 110.00 },
+    { note: "D", freq: 146.83 },
+    { note: "G", freq: 196.00 },
+    { note: "B", freq: 246.94 },
+    { note: "E", freq: 329.63 }
+
+];
+
+//////////////////////////////////////////////////////////
+// FIND CLOSEST STRING
+//////////////////////////////////////////////////////////
+
+function getClosestString(freq) {
+
+    let closest = guitarStrings[0];
+
+    let minDiff = Infinity;
+
+    guitarStrings.forEach(string => {
+
+        const diff =
+            Math.abs(freq - string.freq);
+
+        if (diff < minDiff) {
+
+            minDiff = diff;
+
+            closest = string;
+
+        }
+
+    });
+
+    return closest;
+}
+
+//////////////////////////////////////////////////////////
+// CENTS DIFFERENCE
+//////////////////////////////////////////////////////////
+
+function getCents(freq, targetFreq) {
+
+    return 1200 *
+        Math.log2(freq / targetFreq);
+
+}
+
+//////////////////////////////////////////////////////////
+// UPDATE TUNER UI
+//////////////////////////////////////////////////////////
+
+function updateTuner(freq, note) {
+
+    if (!tunerModal.classList.contains("flex"))
+        return;
+
+    const closest =
+        getClosestString(freq);
+
+    const cents =
+        getCents(freq, closest.freq);
+
+    document.getElementById("tunerNote")
+        .innerText = note;
+
+    document.getElementById("tunerFreq")
+        .innerText = freq.toFixed(2) + " Hz";
+
+    document.getElementById("closestString")
+        .innerText = closest.note;
+
+    const needle =
+        document.getElementById("tuningNeedle");
+
+    let pos =
+        Math.max(-50, Math.min(50, cents));
+
+    needle.style.left =
+        (50 + pos / 2) + "%";
+
+    const status =
+        document.getElementById("tuningStatus");
+
+    if (Math.abs(cents) < 5) {
+
+        status.innerText = "IN TUNE";
+
+        status.className =
+            "text-center text-2xl font-bold text-emerald-400 mb-6";
+
+    }
+
+    else if (cents < 0) {
+
+        status.innerText = "TOO LOW";
+
+        status.className =
+            "text-center text-2xl font-bold text-yellow-400 mb-6";
+
+    }
+
+    else {
+
+        status.innerText = "TOO HIGH";
+
+        status.className =
+            "text-center text-2xl font-bold text-red-400 mb-6";
+
+    }
+}
+
+    
 //////////////////////////////////////////////////////////
 // INIT
 //////////////////////////////////////////////////////////
