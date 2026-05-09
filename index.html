@@ -239,40 +239,78 @@ if (
 
 const chordDb = {
 
-    "C Maj": {
-        positions: [0,1,0,2,3,-1],
-        rootNote: "C"
-    },
+    // MAJOR
+    "C Maj": { positions:[0,1,0,2,3,-1], rootNote:"C" },
+    "C# Maj": { positions:[4,6,6,6,4,-1], rootNote:"C#" },
+    "D Maj": { positions:[2,3,2,0,-1,-1], rootNote:"D" },
+    "D# Maj": { positions:[6,8,8,8,6,-1], rootNote:"D#" },
+    "E Maj": { positions:[0,0,1,2,2,0], rootNote:"E" },
+    "F Maj": { positions:[1,1,2,3,3,1], rootNote:"F" },
+    "F# Maj": { positions:[2,2,3,4,4,2], rootNote:"F#" },
+    "G Maj": { positions:[3,0,0,0,2,3], rootNote:"G" },
+    "G# Maj": { positions:[4,4,5,6,6,4], rootNote:"G#" },
+    "A Maj": { positions:[0,2,2,2,0,-1], rootNote:"A" },
+    "A# Maj": { positions:[1,3,3,3,1,-1], rootNote:"A#" },
+    "B Maj": { positions:[2,4,4,4,2,-1], rootNote:"B" },
 
-    "G Maj": {
-        positions: [3,0,0,0,2,3],
-        rootNote: "G"
-    },
+    // MINOR
+    "C Min": { positions:[3,4,5,5,3,-1], rootNote:"C" },
+    "C# Min": { positions:[4,5,6,6,4,-1], rootNote:"C#" },
+    "D Min": { positions:[1,3,2,0,-1,-1], rootNote:"D" },
+    "D# Min": { positions:[6,7,8,8,6,-1], rootNote:"D#" },
+    "E Min": { positions:[0,0,0,2,2,0], rootNote:"E" },
+    "F Min": { positions:[1,1,1,3,3,1], rootNote:"F" },
+    "F# Min": { positions:[2,2,2,4,4,2], rootNote:"F#" },
+    "G Min": { positions:[3,3,3,5,5,3], rootNote:"G" },
+    "G# Min": { positions:[4,4,4,6,6,4], rootNote:"G#" },
+    "A Min": { positions:[0,1,2,2,0,-1], rootNote:"A" },
+    "A# Min": { positions:[1,2,3,3,1,-1], rootNote:"A#" },
+    "B Min": { positions:[2,3,4,4,2,-1], rootNote:"B" },
 
-    "D Maj": {
-        positions: [2,3,2,0,-1,-1],
-        rootNote: "D"
-    },
+    // DOMINANT 7
+    "C7": { positions:[0,1,3,2,3,-1], rootNote:"C" },
+    "D7": { positions:[2,1,2,0,-1,-1], rootNote:"D" },
+    "E7": { positions:[0,0,1,0,2,0], rootNote:"E" },
+    "F7": { positions:[1,1,2,1,3,1], rootNote:"F" },
+    "G7": { positions:[1,0,0,0,2,3], rootNote:"G" },
+    "A7": { positions:[0,2,0,2,0,-1], rootNote:"A" },
+    "B7": { positions:[2,0,2,1,2,-1], rootNote:"B" },
 
-    "A Maj": {
-        positions: [0,2,2,2,0,-1],
-        rootNote: "A"
-    },
+    // MAJOR 7
+    "Cmaj7": { positions:[0,0,0,2,3,-1], rootNote:"C" },
+    "Dmaj7": { positions:[2,2,2,0,-1,-1], rootNote:"D" },
+    "Emaj7": { positions:[0,0,1,1,2,0], rootNote:"E" },
+    "Fmaj7": { positions:[0,1,2,3,-1,-1], rootNote:"F" },
+    "Gmaj7": { positions:[2,0,0,0,2,3], rootNote:"G" },
+    "Amaj7": { positions:[0,2,1,2,0,-1], rootNote:"A" },
 
-    "E Maj": {
-        positions: [0,0,1,2,2,0],
-        rootNote: "E"
-    },
+    // MINOR 7
+    "Cm7": { positions:[3,4,3,5,3,-1], rootNote:"C" },
+    "Dm7": { positions:[1,1,2,0,-1,-1], rootNote:"D" },
+    "Em7": { positions:[0,0,0,0,2,0], rootNote:"E" },
+    "Fm7": { positions:[1,1,1,1,3,1], rootNote:"F" },
+    "Gm7": { positions:[3,3,3,3,5,3], rootNote:"G" },
+    "Am7": { positions:[0,1,0,2,0,-1], rootNote:"A" },
+    "Bm7": { positions:[2,3,2,4,2,-1], rootNote:"B" },
 
-    "A Min": {
-        positions: [0,1,2,2,0,-1],
-        rootNote: "A"
-    },
+    // SUSPENDED
+    "Csus2": { positions:[3,3,0,0,3,-1], rootNote:"C" },
+    "Csus4": { positions:[1,1,0,3,3,-1], rootNote:"C" },
+    "Dsus2": { positions:[0,3,2,0,-1,-1], rootNote:"D" },
+    "Dsus4": { positions:[3,3,2,0,-1,-1], rootNote:"D" },
+    "Esus4": { positions:[0,0,2,2,2,0], rootNote:"E" },
+    "Gsus4": { positions:[1,0,0,0,3,3], rootNote:"G" },
+    "Asus2": { positions:[0,0,2,2,0,-1], rootNote:"A" },
+    "Asus4": { positions:[0,3,2,2,0,-1], rootNote:"A" },
 
-    "E Min": {
-        positions: [0,0,0,2,2,0],
-        rootNote: "E"
-    }
+    // POWER CHORDS
+    "C5": { positions:[-1,-1,5,5,3,-1], rootNote:"C" },
+    "D5": { positions:[-1,-1,7,7,5,-1], rootNote:"D" },
+    "E5": { positions:[-1,-1,9,9,7,0], rootNote:"E" },
+    "F5": { positions:[-1,-1,10,10,8,1], rootNote:"F" },
+    "G5": { positions:[-1,-1,0,0,2,3], rootNote:"G" },
+    "A5": { positions:[-1,-1,2,2,0,-1], rootNote:"A" },
+    "B5": { positions:[-1,-1,4,4,2,-1], rootNote:"B" }
 
 };
 
@@ -285,6 +323,20 @@ let currentChordIndex = 0;
 //////////////////////////////////////////////////////////
 
 const chordSelect = document.getElementById("chordSelect");
+
+chordSelect.innerHTML = "";
+
+Object.keys(chordDb).forEach(chord => {
+
+    const option = document.createElement("option");
+
+    option.value = chord;
+
+    option.textContent = chord;
+
+    chordSelect.appendChild(option);
+
+});
 
 chordSelect.addEventListener("change", () => {
 
