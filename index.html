@@ -1,230 +1,621 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>God Mode Guitar Trainer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tonaljs/tonal/browser/tonal.min.js"></script>
-    <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; }
-        .string { stroke: #64748b; stroke-width: 2; }
-        .fret { stroke: #334155; stroke-width: 4; }
-        .finger { fill: #3b82f6; transition: all 0.3s ease; }
-        .nut { stroke: #cbd5e1; stroke-width: 6; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>God Mode Guitar Trainer</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    body {
+        background-color: #0f172a;
+        color: #f8fafc;
+        font-family: system-ui, sans-serif;
+    }
+
+    .string {
+        stroke: #64748b;
+        stroke-width: 2;
+    }
+
+    .fret {
+        stroke: #334155;
+        stroke-width: 4;
+    }
+
+    .finger {
+        fill: #3b82f6;
+        transition: all 0.3s ease;
+    }
+
+    .nut {
+        stroke: #cbd5e1;
+        stroke-width: 6;
+    }
+
+    select {
+        background-color: #1e293b;
+        color: white;
+        border: 1px solid #334155;
+        padding: 10px 14px;
+        border-radius: 12px;
+        outline: none;
+        width: 100%;
+    }
+
+    .status-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        background: #ef4444;
+    }
+
+    .status-active {
+        background: #22c55e;
+        box-shadow: 0 0 12px #22c55e;
+    }
+</style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-6">
 
-    <div class="max-w-4xl w-full bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700">
-        <!-- Header -->
-        <div class="p-6 bg-slate-900 border-b border-slate-700 flex justify-between items-center">
-            <h1 class="text-3xl font-bold text-blue-400 tracking-tight">Guitar<span class="text-white">Pro</span> Trainer</h1>
-            <button id="micBtn" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full transition-all shadow-lg shadow-blue-500/30">
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+<div class="max-w-5xl w-full bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700">
+
+    <!-- HEADER -->
+    <div class="p-6 bg-slate-900 border-b border-slate-700 flex flex-col md:flex-row gap-4 justify-between items-center">
+
+        <h1 class="text-3xl font-bold text-blue-400 tracking-tight">
+            Guitar<span class="text-white">Pro</span> Trainer
+        </h1>
+
+        <div class="flex gap-3 w-full md:w-auto">
+
+            <!-- CHORD SELECTOR -->
+            <select id="chordSelect">
+
+                <option value="C Maj">C Maj</option>
+                <option value="G Maj">G Maj</option>
+                <option value="D Maj">D Maj</option>
+                <option value="A Maj">A Maj</option>
+                <option value="E Maj">E Maj</option>
+
+                <option value="A Min">A Min</option>
+                <option value="E Min">E Min</option>
+
+            </select>
+
+            <!-- MIC BUTTON -->
+            <button
+                id="micBtn"
+                class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all">
+
                 🎤 Enable Mic
+
             </button>
+
         </div>
 
-        <!-- Main Interface -->
-        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-            
-            <!-- Trainer Logic -->
-            <div class="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-xl border border-slate-700">
-                <h2 class="text-gray-400 uppercase tracking-widest text-sm mb-2">Target Chord</h2>
-                <div id="targetChordDisplay" class="text-7xl font-black text-white mb-6">C Maj</div>
-                <div class="flex space-x-4 w-full">
-                    <button onclick="nextChord()" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition font-semibold">Skip Chord</button>
-                </div>
-            </div>
-
-            <!-- Audio Detection HUD -->
-            <div class="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-xl border border-slate-700 relative overflow-hidden">
-                <h2 class="text-gray-400 uppercase tracking-widest text-sm mb-2 z-10">Detected Pitch</h2>
-                <div id="detectedNoteDisplay" class="text-7xl font-black text-emerald-400 z-10">--</div>
-                <div id="frequencyDisplay" class="text-sm text-gray-500 mt-2 z-10">0 Hz</div>
-                
-                <!-- Feedback visualizer -->
-                <div id="glow" class="absolute inset-0 bg-emerald-500 opacity-0 transition-opacity duration-300 pointer-events-none"></div>
-            </div>
-        </div>
-
-        <!-- Fretboard Visualization -->
-        <div class="p-8 bg-slate-800 border-t border-slate-700">
-            <h3 class="text-gray-400 uppercase tracking-widest text-sm mb-4">Fretboard Depiction</h3>
-            <div class="w-full overflow-x-auto">
-                <svg viewBox="0 0 800 200" class="w-full h-auto min-w-[600px] bg-slate-900 rounded-lg p-4">
-                    <!-- Strings -->
-                    <line class="string" x1="50" y1="25" x2="780" y2="25" />
-                    <line class="string" x1="50" y1="55" x2="780" y2="55" />
-                    <line class="string" x1="50" y1="85" x2="780" y2="85" />
-                    <line class="string" x1="50" y1="115" x2="780" y2="115" />
-                    <line class="string" x1="50" y1="145" x2="780" y2="145" />
-                    <line class="string" x1="50" y1="175" x2="780" y2="175" />
-
-                    <!-- Nut & Frets -->
-                    <line class="nut" x1="50" y1="20" x2="50" y2="180" />
-                    <line class="fret" x1="196" y1="20" x2="196" y2="180" />
-                    <line class="fret" x1="342" y1="20" x2="342" y2="180" />
-                    <line class="fret" x1="488" y1="20" x2="488" y2="180" />
-                    <line class="fret" x1="634" y1="20" x2="634" y2="180" />
-                    <line class="fret" x1="780" y1="20" x2="780" y2="180" />
-
-                    <!-- Fret Markers -->
-                    <circle cx="415" cy="100" r="6" fill="#475569" />
-                    <circle cx="707" cy="100" r="6" fill="#475569" />
-
-                    <!-- Dynamic Fingers Group -->
-                    <g id="fingers"></g>
-                </svg>
-            </div>
-        </div>
     </div>
 
-    <script>
-        // --- CHORD DICTIONARY ---
-        // Strings: [e, B, G, D, A, E] (High to Low). 0 = Open, -1 = Muted, 1+ = Fret
-        const chordDb = {
-            "C Maj":  { positions: [0, 1, 0, 2, 3, -1], rootNote: "C" },
-            "G Maj":  { positions: [3, 0, 0, 0, 2, 3], rootNote: "G" },
-            "D Maj":  { positions: [2, 3, 2, 0, -1, -1], rootNote: "D" },
-            "A Maj":  { positions: [0, 2, 2, 2, 0, -1], rootNote: "A" },
-            "E Maj":  { positions: [0, 0, 1, 2, 2, 0], rootNote: "E" },
-            "A Min":  { positions: [0, 1, 2, 2, 0, -1], rootNote: "A" },
-            "E Min":  { positions: [0, 0, 0, 2, 2, 0], rootNote: "E" }
-        };
+    <!-- MAIN -->
+    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        const chordKeys = Object.keys(chordDb);
-        let currentChordIndex = 0;
+        <!-- TARGET -->
+        <div class="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-xl border border-slate-700">
 
-        // --- AUDIO ENGINE ---
-        let audioContext;
-        let analyser;
-        let isListening = false;
-        
-        const startAudio = async () => {
-            if (isListening) return;
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                const source = audioContext.createMediaStreamSource(stream);
-                
-                analyser = audioContext.createAnalyser();
-                analyser.fftSize = 2048;
-                source.connect(analyser);
-                
-                isListening = true;
-                document.getElementById('micBtn').innerText = "🎙️ Listening...";
-                document.getElementById('micBtn').classList.replace('bg-blue-600', 'bg-red-500');
-                
-                detectPitch();
-            } catch (err) {
-                alert("Microphone access denied or unavailable. Please allow mic access to use the tuner.");
-                console.error(err);
-            }
-        };
+            <h2 class="text-gray-400 uppercase tracking-widest text-sm mb-2">
+                Target Chord
+            </h2>
 
-        document.getElementById('micBtn').addEventListener('click', startAudio);
+            <div
+                id="targetChordDisplay"
+                class="text-6xl font-black text-white mb-6">
 
-        // --- PITCH DETECTION (Auto-Correlation) ---
-        function autoCorrelate(buffer, sampleRate) {
-            let SIZE = buffer.length;
-            let rms = 0;
-            for (let i = 0; i < SIZE; i++) rms += buffer[i] * buffer[i];
-            rms = Math.sqrt(rms / SIZE);
-            if (rms < 0.01) return -1; // Not enough signal
+                C Maj
 
-            let r1 = 0, r2 = SIZE - 1, thres = 0.2;
-            for (var i = 0; i < SIZE / 2; i++) if (Math.abs(buffer[i]) < thres) { r1 = i; break; }
-            for (var i = 1; i < SIZE / 2; i++) if (Math.abs(buffer[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+            </div>
 
-            buffer = buffer.slice(r1, r2);
-            SIZE = buffer.length;
+            <button
+                onclick="nextChord()"
+                class="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition font-semibold">
 
-            let c = new Array(SIZE).fill(0);
-            for (let i = 0; i < SIZE; i++) {
-                for (let j = 0; j < SIZE - i; j++) {
-                    c[i] = c[i] + buffer[j] * buffer[j + i];
+                Next Chord
+
+            </button>
+
+        </div>
+
+        <!-- DETECTION -->
+        <div class="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-xl border border-slate-700 relative overflow-hidden">
+
+            <h2 class="text-gray-400 uppercase tracking-widest text-sm mb-2 z-10">
+                Detected Pitch
+            </h2>
+
+            <div
+                id="detectedNoteDisplay"
+                class="text-6xl font-black text-emerald-400 z-10">
+
+                --
+
+            </div>
+
+            <div
+                id="frequencyDisplay"
+                class="text-sm text-gray-500 mt-2 z-10">
+
+                0 Hz
+
+            </div>
+
+            <!-- STATUS -->
+            <div class="flex items-center gap-2 mt-4 z-10">
+
+                <div id="statusDot" class="status-dot"></div>
+
+                <span id="statusText" class="text-sm text-gray-400">
+                    Waiting for audio...
+                </span>
+
+            </div>
+
+            <!-- GLOW -->
+            <div
+                id="glow"
+                class="absolute inset-0 bg-emerald-500 opacity-0 transition-opacity duration-300 pointer-events-none">
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FRETBOARD -->
+    <div class="p-6 bg-slate-800 border-t border-slate-700">
+
+        <h3 class="text-gray-400 uppercase tracking-widest text-sm mb-4">
+            Fretboard
+        </h3>
+
+        <div class="overflow-x-auto">
+
+            <svg
+                viewBox="0 0 800 200"
+                class="w-full min-w-[600px] bg-slate-900 rounded-lg p-4">
+
+                <!-- STRINGS -->
+                <line class="string" x1="50" y1="25" x2="780" y2="25"/>
+                <line class="string" x1="50" y1="55" x2="780" y2="55"/>
+                <line class="string" x1="50" y1="85" x2="780" y2="85"/>
+                <line class="string" x1="50" y1="115" x2="780" y2="115"/>
+                <line class="string" x1="50" y1="145" x2="780" y2="145"/>
+                <line class="string" x1="50" y1="175" x2="780" y2="175"/>
+
+                <!-- FRETS -->
+                <line class="nut" x1="50" y1="20" x2="50" y2="180"/>
+
+                <line class="fret" x1="196" y1="20" x2="196" y2="180"/>
+                <line class="fret" x1="342" y1="20" x2="342" y2="180"/>
+                <line class="fret" x1="488" y1="20" x2="488" y2="180"/>
+                <line class="fret" x1="634" y1="20" x2="634" y2="180"/>
+                <line class="fret" x1="780" y1="20" x2="780" y2="180"/>
+
+                <!-- MARKERS -->
+                <circle cx="415" cy="100" r="6" fill="#475569"/>
+                <circle cx="707" cy="100" r="6" fill="#475569"/>
+
+                <!-- DYNAMIC -->
+                <g id="fingers"></g>
+
+            </svg>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+//////////////////////////////////////////////////////////
+// SECURITY CHECK
+//////////////////////////////////////////////////////////
+
+if (
+    location.protocol !== "https:" &&
+    location.hostname !== "localhost" &&
+    location.hostname !== "127.0.0.1"
+) {
+    alert(
+        "Microphone requires HTTPS or localhost.\n\n" +
+        "Upload to GitHub Pages or use local server."
+    );
+}
+
+//////////////////////////////////////////////////////////
+// CHORD DATABASE
+//////////////////////////////////////////////////////////
+
+const chordDb = {
+
+    "C Maj": {
+        positions: [0,1,0,2,3,-1],
+        rootNote: "C"
+    },
+
+    "G Maj": {
+        positions: [3,0,0,0,2,3],
+        rootNote: "G"
+    },
+
+    "D Maj": {
+        positions: [2,3,2,0,-1,-1],
+        rootNote: "D"
+    },
+
+    "A Maj": {
+        positions: [0,2,2,2,0,-1],
+        rootNote: "A"
+    },
+
+    "E Maj": {
+        positions: [0,0,1,2,2,0],
+        rootNote: "E"
+    },
+
+    "A Min": {
+        positions: [0,1,2,2,0,-1],
+        rootNote: "A"
+    },
+
+    "E Min": {
+        positions: [0,0,0,2,2,0],
+        rootNote: "E"
+    }
+
+};
+
+const chordKeys = Object.keys(chordDb);
+
+let currentChordIndex = 0;
+
+//////////////////////////////////////////////////////////
+// CHORD SELECTOR
+//////////////////////////////////////////////////////////
+
+const chordSelect = document.getElementById("chordSelect");
+
+chordSelect.addEventListener("change", () => {
+
+    const chordName = chordSelect.value;
+
+    currentChordIndex = chordKeys.indexOf(chordName);
+
+    drawFretboard(chordName);
+
+});
+
+//////////////////////////////////////////////////////////
+// AUDIO ENGINE
+//////////////////////////////////////////////////////////
+
+let audioContext;
+let analyser;
+let isListening = false;
+
+async function startAudio() {
+
+    if (isListening) return;
+
+    try {
+
+        // CREATE AUDIO CONTEXT
+        audioContext =
+            new (window.AudioContext || window.webkitAudioContext)();
+
+        // IMPORTANT FOR ANDROID
+        await audioContext.resume();
+
+        // GET MICROPHONE
+        const stream =
+            await navigator.mediaDevices.getUserMedia({
+
+                audio: {
+
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false,
+                    channelCount: 1,
+                    sampleRate: 48000
+
                 }
-            }
 
-            let d = 0; while (c[d] > c[d + 1]) d++;
-            let maxval = -1, maxpos = -1;
-            for (let i = d; i < SIZE; i++) {
-                if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
-            }
-            let T0 = maxpos;
-            return sampleRate / T0;
-        }
-
-        function detectPitch() {
-            if (!isListening) return;
-            const buffer = new Float32Array(analyser.fftSize);
-            analyser.getFloatTimeDomainData(buffer);
-            
-            const pitch = autoCorrelate(buffer, audioContext.sampleRate);
-            
-            if (pitch !== -1) {
-                const noteStr = Tonal.Note.fromFreq(pitch);
-                document.getElementById('detectedNoteDisplay').innerText = noteStr;
-                document.getElementById('frequencyDisplay').innerText = pitch.toFixed(2) + " Hz";
-
-                // Validate against target chord root note
-                const targetRoot = chordDb[chordKeys[currentChordIndex]].rootNote;
-                if (noteStr.includes(targetRoot)) {
-                    document.getElementById('glow').style.opacity = "0.2";
-                } else {
-                    document.getElementById('glow').style.opacity = "0";
-                }
-            } else {
-                document.getElementById('glow').style.opacity = "0";
-            }
-            
-            requestAnimationFrame(detectPitch);
-        }
-
-        // --- UI & FRETBOARD LOGIC ---
-        function drawFretboard(chordName) {
-            const chord = chordDb[chordName];
-            const fingersGroup = document.getElementById('fingers');
-            fingersGroup.innerHTML = ''; // Clear previous
-
-            document.getElementById('targetChordDisplay').innerText = chordName;
-
-            chord.positions.forEach((fret, stringIndex) => {
-                const yPos = 25 + (stringIndex * 30);
-                
-                if (fret > 0) {
-                    // Calculate X position between frets
-                    const fretWidth = 146; 
-                    const xPos = 50 + (fret * fretWidth) - (fretWidth / 2);
-                    
-                    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                    circle.setAttribute("cx", xPos);
-                    circle.setAttribute("cy", yPos);
-                    circle.setAttribute("r", "12");
-                    circle.setAttribute("class", "finger shadow-lg");
-                    fingersGroup.appendChild(circle);
-                } else if (fret === -1) {
-                    // Draw 'X' for muted strings
-                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    text.setAttribute("x", "20");
-                    text.setAttribute("y", yPos + 6);
-                    text.setAttribute("fill", "#ef4444");
-                    text.setAttribute("font-size", "20");
-                    text.setAttribute("font-weight", "bold");
-                    text.textContent = "X";
-                    fingersGroup.appendChild(text);
-                }
             });
+
+        // SOURCE
+        const source =
+            audioContext.createMediaStreamSource(stream);
+
+        // ANALYSER
+        analyser = audioContext.createAnalyser();
+
+        analyser.fftSize = 4096;
+
+        source.connect(analyser);
+
+        isListening = true;
+
+        // UI UPDATE
+        document.getElementById("micBtn").innerText =
+            "🎙️ Listening";
+
+        document.getElementById("micBtn")
+            .classList.replace("bg-blue-600", "bg-red-500");
+
+        document.getElementById("statusText").innerText =
+            "Microphone active";
+
+        document.getElementById("statusDot")
+            .classList.add("status-active");
+
+        // START LOOP
+        detectPitch();
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert(
+            "Microphone failed.\n\n" +
+            "1. Allow mic permission\n" +
+            "2. Reload page\n" +
+            "3. Use HTTPS\n" +
+            "4. Try Chrome if Opera fails"
+        );
+    }
+}
+
+document.getElementById("micBtn")
+    .addEventListener("click", startAudio);
+
+//////////////////////////////////////////////////////////
+// AUTOCORRELATION
+//////////////////////////////////////////////////////////
+
+function autoCorrelate(buffer, sampleRate) {
+
+    let SIZE = buffer.length;
+
+    let rms = 0;
+
+    for (let i = 0; i < SIZE; i++) {
+
+        rms += buffer[i] * buffer[i];
+
+    }
+
+    rms = Math.sqrt(rms / SIZE);
+
+    // LOWERED FOR PHONE MICS
+    if (rms < 0.003) return -1;
+
+    let r1 = 0;
+    let r2 = SIZE - 1;
+    let threshold = 0.2;
+
+    for (let i = 0; i < SIZE / 2; i++) {
+
+        if (Math.abs(buffer[i]) < threshold) {
+
+            r1 = i;
+            break;
+        }
+    }
+
+    for (let i = 1; i < SIZE / 2; i++) {
+
+        if (Math.abs(buffer[SIZE - i]) < threshold) {
+
+            r2 = SIZE - i;
+            break;
+        }
+    }
+
+    buffer = buffer.slice(r1, r2);
+
+    SIZE = buffer.length;
+
+    const c = new Array(SIZE).fill(0);
+
+    for (let i = 0; i < SIZE; i++) {
+
+        for (let j = 0; j < SIZE - i; j++) {
+
+            c[i] += buffer[j] * buffer[j + i];
+
+        }
+    }
+
+    let d = 0;
+
+    while (c[d] > c[d + 1]) d++;
+
+    let maxValue = -1;
+    let maxPosition = -1;
+
+    for (let i = d; i < SIZE; i++) {
+
+        if (c[i] > maxValue) {
+
+            maxValue = c[i];
+            maxPosition = i;
+
+        }
+    }
+
+    const T0 = maxPosition;
+
+    return sampleRate / T0;
+}
+
+//////////////////////////////////////////////////////////
+// FREQUENCY -> NOTE
+//////////////////////////////////////////////////////////
+
+const noteStrings = [
+
+    "C","C#","D","D#","E","F",
+    "F#","G","G#","A","A#","B"
+
+];
+
+function frequencyToNote(freq) {
+
+    const noteNum =
+        12 * (Math.log(freq / 440) / Math.log(2));
+
+    const midi =
+        Math.round(noteNum) + 69;
+
+    return noteStrings[midi % 12];
+}
+
+//////////////////////////////////////////////////////////
+// DETECT LOOP
+//////////////////////////////////////////////////////////
+
+function detectPitch() {
+
+    if (!isListening) return;
+
+    const buffer =
+        new Float32Array(analyser.fftSize);
+
+    analyser.getFloatTimeDomainData(buffer);
+
+    const pitch =
+        autoCorrelate(buffer, audioContext.sampleRate);
+
+    if (pitch !== -1 && pitch > 50 && pitch < 1200) {
+
+        const note =
+            frequencyToNote(pitch);
+
+        document.getElementById("detectedNoteDisplay")
+            .innerText = note;
+
+        document.getElementById("frequencyDisplay")
+            .innerText = pitch.toFixed(2) + " Hz";
+
+        const targetRoot =
+            chordDb[chordKeys[currentChordIndex]].rootNote;
+
+        if (note === targetRoot) {
+
+            document.getElementById("glow").style.opacity = "0.2";
+
+        } else {
+
+            document.getElementById("glow").style.opacity = "0";
         }
 
-        function nextChord() {
-            currentChordIndex = (currentChordIndex + 1) % chordKeys.length;
-            drawFretboard(chordKeys[currentChordIndex]);
+    } else {
+
+        document.getElementById("glow").style.opacity = "0";
+    }
+
+    requestAnimationFrame(detectPitch);
+}
+
+//////////////////////////////////////////////////////////
+// DRAW FRETBOARD
+//////////////////////////////////////////////////////////
+
+function drawFretboard(chordName) {
+
+    const chord = chordDb[chordName];
+
+    const fingersGroup =
+        document.getElementById("fingers");
+
+    fingersGroup.innerHTML = "";
+
+    document.getElementById("targetChordDisplay")
+        .innerText = chordName;
+
+    chord.positions.forEach((fret, stringIndex) => {
+
+        const yPos = 25 + (stringIndex * 30);
+
+        if (fret > 0) {
+
+            const fretWidth = 146;
+
+            const xPos =
+                50 + (fret * fretWidth) - (fretWidth / 2);
+
+            const circle =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "circle"
+                );
+
+            circle.setAttribute("cx", xPos);
+            circle.setAttribute("cy", yPos);
+            circle.setAttribute("r", "12");
+            circle.setAttribute("class", "finger");
+
+            fingersGroup.appendChild(circle);
+
         }
 
-        // Initialize first chord on load
-        drawFretboard(chordKeys[0]);
-    </script>
+        else if (fret === -1) {
+
+            const text =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "text"
+                );
+
+            text.setAttribute("x", "20");
+            text.setAttribute("y", yPos + 6);
+
+            text.setAttribute("fill", "#ef4444");
+
+            text.setAttribute("font-size", "20");
+
+            text.setAttribute("font-weight", "bold");
+
+            text.textContent = "X";
+
+            fingersGroup.appendChild(text);
+        }
+    });
+}
+
+//////////////////////////////////////////////////////////
+// NEXT CHORD
+//////////////////////////////////////////////////////////
+
+function nextChord() {
+
+    currentChordIndex =
+        (currentChordIndex + 1) % chordKeys.length;
+
+    chordSelect.value =
+        chordKeys[currentChordIndex];
+
+    drawFretboard(chordKeys[currentChordIndex]);
+}
+
+//////////////////////////////////////////////////////////
+// INIT
+//////////////////////////////////////////////////////////
+
+drawFretboard(chordKeys[0]);
+
+</script>
+
 </body>
 </html>
