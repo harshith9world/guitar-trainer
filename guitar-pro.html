@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>God Mode Guitar Trainer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonaljs/tonal/browser/tonal.min.js"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; }
+        .string { stroke: #64748b; stroke-width: 2; }
+        .fret { stroke: #334155; stroke-width: 4; }
+        .finger { fill: #3b82f6; transition: all 0.3s ease; }
+        .nut { stroke: #cbd5e1; stroke-width: 6; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-6">
+
+    <div class="max-w-4xl w-full bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700">
+        <!-- Header -->
+        <div class="p-6 bg-slate-900 border-b border-slate-700 flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-blue-400 tracking-tight">Guitar<span class="text-white">Pro</span> Trainer</h1>
+            <button id="micBtn" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full transition-all shadow-lg shadow-blue-500/30">
+                🎤 Enable Mic
+            </button>
+        </div>
+
+        <!-- Main Interface -->
+        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Trainer Logic -->
+            <div class="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-xl border border-slate-700">
+                <h2 class="text-gray-400 uppercase tracking-widest text-sm mb-2">Target Chord</h2>
+                <div id="targetChordDisplay" class="text-7xl font-black text-white mb-6">C Maj</div>
+                <div class="flex space-x-4 w-full">
+                    <button onclick="nextChord()" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition font-semibold">Skip Chord</button>
+                </div>
+            </div>
+
+            <!-- Audio Detection HUD -->
+            <div class="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-xl border border-slate-700 relative overflow-hidden">
+                <h2 class="text-gray-400 uppercase tracking-widest text-sm mb-2 z-10">Detected Pitch</h2>
+                <div id="detectedNoteDisplay" class="text-7xl font-black text-emerald-400 z-10">--</div>
+                <div id="frequencyDisplay" class="text-sm text-gray-500 mt-2 z-10">0 Hz</div>
+                
+                <!-- Feedback visualizer -->
+                <div id="glow" class="absolute inset-0 bg-emerald-500 opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+            </div>
+        </div>
+
+        <!-- Fretboard Visualization -->
+        <div class="p-8 bg-slate-800 border-t border-slate-700">
+            <h3 class="text-gray-400 uppercase tracking-widest text-sm mb-4">Fretboard Depiction</h3>
+            <div class="w-full overflow-x-auto">
+                <svg viewBox="0 0 800 200" class="w-full h-auto min-w-[600px] bg-slate-900 rounded-lg p-4">
+                    <!-- Strings -->
+                    <line class="string" x1="50" y1="25" x2="780" y2="25" />
+                    <line class="string" x1="50" y1="55" x2="780" y2="55" />
+                    <line class="string" x1="50" y1="85" x2="780" y2="85" />
+                    <line class="string" x1="50" y1="115" x2="780" y2="115" />
+                    <line class="string" x1="50" y1="145" x2="780" y2="145" />
+                    <line class="string" x1="50" y1="175" x2="780" y2="175" />
+
+                    <!-- Nut & Frets -->
+                    <line class="nut" x1="50" y1="20" x2="50" y2="180" />
+                    <line class="fret" x1="196" y1="20" x2="196" y2="180" />
+                    <line class="fret" x1="342" y1="20" x2="342" y2="180" />
+                    <line class="fret" x1="488" y1="20" x2="488" y2="180" />
+                    <line class="fret" x1="634" y1="20" x2="634" y2="180" />
+                    <line class="fret" x1="780" y1="20" x2="780" y2="180" />
+
+                    <!-- Fret Markers -->
+                    <circle cx="415" cy="100" r="6" fill="#475569" />
+                    <circle cx="707" cy="100" r="6" fill="#475569" />
+
+                    <!-- Dynamic Fingers Group -->
+                    <g id="fingers"></g>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CHORD DICTIONARY ---
+        // Strings: [e, B, G, D, A, E] (High to Low). 0 = Open, -1 = Muted, 1+ = Fret
+        const chordDb = {
+            "C Maj":  { positions: [0, 1, 0, 2, 3, -1], rootNote: "C" },
+            "G Maj":  { positions: [3, 0, 0, 0, 2, 3], rootNote: "G" },
+            "D Maj":  { positions: [2, 3, 2, 0, -1, -1], rootNote: "D" },
+            "A Maj":  { positions: [0, 2, 2, 2, 0, -1], rootNote: "A" },
+            "E Maj":  { positions: [0, 0, 1, 2, 2, 0], rootNote: "E" },
+            "A Min":  { positions: [0, 1, 2, 2, 0, -1], rootNote: "A" },
+            "E Min":  { positions: [0, 0, 0, 2, 2, 0], rootNote: "E" }
+        };
+
+        const chordKeys = Object.keys(chordDb);
+        let currentChordIndex = 0;
+
+        // --- AUDIO ENGINE ---
+        let audioContext;
+        let analyser;
+        let isListening = false;
+        
+        const startAudio = async () => {
+            if (isListening) return;
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const source = audioContext.createMediaStreamSource(stream);
+                
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048;
+                source.connect(analyser);
+                
+                isListening = true;
+                document.getElementById('micBtn').innerText = "🎙️ Listening...";
+                document.getElementById('micBtn').classList.replace('bg-blue-600', 'bg-red-500');
+                
+                detectPitch();
+            } catch (err) {
+                alert("Microphone access denied or unavailable. Please allow mic access to use the tuner.");
+                console.error(err);
+            }
+        };
+
+        document.getElementById('micBtn').addEventListener('click', startAudio);
+
+        // --- PITCH DETECTION (Auto-Correlation) ---
+        function autoCorrelate(buffer, sampleRate) {
+            let SIZE = buffer.length;
+            let rms = 0;
+            for (let i = 0; i < SIZE; i++) rms += buffer[i] * buffer[i];
+            rms = Math.sqrt(rms / SIZE);
+            if (rms < 0.01) return -1; // Not enough signal
+
+            let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+            for (var i = 0; i < SIZE / 2; i++) if (Math.abs(buffer[i]) < thres) { r1 = i; break; }
+            for (var i = 1; i < SIZE / 2; i++) if (Math.abs(buffer[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+
+            buffer = buffer.slice(r1, r2);
+            SIZE = buffer.length;
+
+            let c = new Array(SIZE).fill(0);
+            for (let i = 0; i < SIZE; i++) {
+                for (let j = 0; j < SIZE - i; j++) {
+                    c[i] = c[i] + buffer[j] * buffer[j + i];
+                }
+            }
+
+            let d = 0; while (c[d] > c[d + 1]) d++;
+            let maxval = -1, maxpos = -1;
+            for (let i = d; i < SIZE; i++) {
+                if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
+            }
+            let T0 = maxpos;
+            return sampleRate / T0;
+        }
+
+        function detectPitch() {
+            if (!isListening) return;
+            const buffer = new Float32Array(analyser.fftSize);
+            analyser.getFloatTimeDomainData(buffer);
+            
+            const pitch = autoCorrelate(buffer, audioContext.sampleRate);
+            
+            if (pitch !== -1) {
+                const noteStr = Tonal.Note.fromFreq(pitch);
+                document.getElementById('detectedNoteDisplay').innerText = noteStr;
+                document.getElementById('frequencyDisplay').innerText = pitch.toFixed(2) + " Hz";
+
+                // Validate against target chord root note
+                const targetRoot = chordDb[chordKeys[currentChordIndex]].rootNote;
+                if (noteStr.includes(targetRoot)) {
+                    document.getElementById('glow').style.opacity = "0.2";
+                } else {
+                    document.getElementById('glow').style.opacity = "0";
+                }
+            } else {
+                document.getElementById('glow').style.opacity = "0";
+            }
+            
+            requestAnimationFrame(detectPitch);
+        }
+
+        // --- UI & FRETBOARD LOGIC ---
+        function drawFretboard(chordName) {
+            const chord = chordDb[chordName];
+            const fingersGroup = document.getElementById('fingers');
+            fingersGroup.innerHTML = ''; // Clear previous
+
+            document.getElementById('targetChordDisplay').innerText = chordName;
+
+            chord.positions.forEach((fret, stringIndex) => {
+                const yPos = 25 + (stringIndex * 30);
+                
+                if (fret > 0) {
+                    // Calculate X position between frets
+                    const fretWidth = 146; 
+                    const xPos = 50 + (fret * fretWidth) - (fretWidth / 2);
+                    
+                    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    circle.setAttribute("cx", xPos);
+                    circle.setAttribute("cy", yPos);
+                    circle.setAttribute("r", "12");
+                    circle.setAttribute("class", "finger shadow-lg");
+                    fingersGroup.appendChild(circle);
+                } else if (fret === -1) {
+                    // Draw 'X' for muted strings
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", "20");
+                    text.setAttribute("y", yPos + 6);
+                    text.setAttribute("fill", "#ef4444");
+                    text.setAttribute("font-size", "20");
+                    text.setAttribute("font-weight", "bold");
+                    text.textContent = "X";
+                    fingersGroup.appendChild(text);
+                }
+            });
+        }
+
+        function nextChord() {
+            currentChordIndex = (currentChordIndex + 1) % chordKeys.length;
+            drawFretboard(chordKeys[currentChordIndex]);
+        }
+
+        // Initialize first chord on load
+        drawFretboard(chordKeys[0]);
+    </script>
+</body>
+</html>
