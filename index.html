@@ -63,7 +63,6 @@
 
 <div class="max-w-5xl w-full bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700">
 
-    <!-- HEADER -->
     <div class="p-6 bg-slate-900 border-b border-slate-700 flex flex-col md:flex-row gap-4 justify-between items-center">
 
         <h1 class="text-3xl font-bold text-blue-400 tracking-tight">
@@ -72,50 +71,43 @@
 
         <div class="flex gap-3 w-full md:w-auto">
 
-            <!-- CHORD SELECTOR -->
             <select id="chordSelect">
+                </select>
 
-                <option value="C Maj">C Maj</option>
-                <option value="G Maj">G Maj</option>
-                <option value="D Maj">D Maj</option>
-                <option value="A Maj">A Maj</option>
-                <option value="E Maj">E Maj</option>
-
-                <option value="A Min">A Min</option>
-                <option value="E Min">E Min</option>
-
-            </select>
-
-            <!-- MIC BUTTON -->
             <button
                 id="micBtn"
                 class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all">
-
                 🎤 Enable Mic
-
             </button>
+            
             <button
                 id="openTunerBtn"
                 class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all">
-                
                 🎸 Tuner
             </button>
-			
-			<button
-				id="drillBtn"
-				onclick="toggleDrill()"
-				class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all">
-				⏱️ Start Drill
-			</button>
+            
+            <div class="flex gap-2">
+                <select id="drillSpeed" class="bg-slate-700 text-white border border-slate-600 rounded-xl px-3 outline-none cursor-pointer">
+                    <option value="10000">Beginner (10s)</option>
+                    <option value="8000">Novice (8s)</option>
+                    <option value="6000">Intermediate (6s)</option>
+                    <option value="3500">Expert (3.5s)</option>
+                </select>
+
+                <button
+                    id="drillBtn"
+                    onclick="toggleDrill()"
+                    class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all whitespace-nowrap">
+                    ⏱️ Start Drill
+                </button>
+            </div>
             
         </div>
 
     </div>
 
-    <!-- MAIN -->
     <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        <!-- TARGET -->
         <div class="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-xl border border-slate-700">
 
             <h2 class="text-gray-400 uppercase tracking-widest text-sm mb-2">
@@ -125,28 +117,23 @@
             <div
                 id="targetChordDisplay"
                 class="text-6xl font-black text-white mb-6">
-
                 C Maj
-
             </div>
             
             <button
                 onclick="nextChord()"
                 class="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition font-semibold">
-
                 Next Chord
-
             </button>
-			
-			<button
-				id="playChordBtn"
-				onclick="playCurrentChord()"
-				class="w-full mt-3 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg transition font-semibold text-white">
-				🔊 Play Chord
-			</button>
+            
+            <button
+                id="playChordBtn"
+                onclick="playCurrentChord()"
+                class="w-full mt-3 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg transition font-semibold text-white">
+                🔊 Play Chord
+            </button>
         </div>
 
-        <!-- DETECTION -->
         <div class="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-xl border border-slate-700 relative overflow-hidden">
 
             <h2 class="text-gray-400 uppercase tracking-widest text-sm mb-2 z-10">
@@ -156,36 +143,27 @@
             <div
                 id="detectedNoteDisplay"
                 class="text-6xl font-black text-emerald-400 z-10">
-
                 --
-
             </div>
 
             <div
                 id="frequencyDisplay"
                 class="text-sm text-gray-500 mt-2 z-10">
-
                 0 Hz
-
             </div>
-			
-			<div
-				id="chordNotesDisplay"
-				class="flex gap-2 mt-4 z-10 font-bold text-xl">
+            
+            <div
+                id="chordNotesDisplay"
+                class="flex gap-2 mt-4 z-10 font-bold text-xl">
             </div>
 
-            <!-- STATUS -->
             <div class="flex items-center gap-2 mt-4 z-10">
-
                 <div id="statusDot" class="status-dot"></div>
-
                 <span id="statusText" class="text-sm text-gray-400">
                     Waiting for audio...
                 </span>
-
             </div>
 
-            <!-- GLOW -->
             <div
                 id="glow"
                 class="absolute inset-0 bg-emerald-500 opacity-0 transition-opacity duration-300 pointer-events-none">
@@ -195,7 +173,6 @@
 
     </div>
 
-    <!-- FRETBOARD -->
     <div class="p-6 bg-slate-800 border-t border-slate-700">
 
         <h3 class="text-gray-400 uppercase tracking-widest text-sm mb-4">
@@ -203,12 +180,10 @@
         </h3>
 
         <div class="overflow-x-auto">
-
             <svg
                 viewBox="0 0 800 200"
                 class="w-full min-w-[600px] bg-slate-900 rounded-lg p-4">
 
-                <!-- STRINGS -->
                 <line class="string" x1="50" y1="25" x2="780" y2="25"/>
                 <line class="string" x1="50" y1="55" x2="780" y2="55"/>
                 <line class="string" x1="50" y1="85" x2="780" y2="85"/>
@@ -216,148 +191,68 @@
                 <line class="string" x1="50" y1="145" x2="780" y2="145"/>
                 <line class="string" x1="50" y1="175" x2="780" y2="175"/>
 
-                <!-- FRETS -->
-                <line class="nut" x1="50" y1="20" x2="50" y2="180"/>
-
-                <line class="fret" x1="196" y1="20" x2="196" y2="180"/>
-                <line class="fret" x1="342" y1="20" x2="342" y2="180"/>
-                <line class="fret" x1="488" y1="20" x2="488" y2="180"/>
-                <line class="fret" x1="634" y1="20" x2="634" y2="180"/>
-                <line class="fret" x1="780" y1="20" x2="780" y2="180"/>
-
-                <!-- MARKERS -->
-                <circle cx="415" cy="100" r="6" fill="#475569"/>
-                <circle cx="707" cy="100" r="6" fill="#475569"/>
-
-                <!-- DYNAMIC -->
+                <g id="frets"></g>
+                <g id="markers"></g>
                 <g id="fingers"></g>
-
             </svg>
-
         </div>
-
     </div>
 
 </div>
-<!--/////////////////////////////////////////////////////////
-//Tuner
-////////////////////////////////////////////////////////>
 
-<!-- TUNER MODAL -->
 <div
     id="tunerModal"
     class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
 
     <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-700 p-6 relative">
 
-        <!-- CLOSE -->
         <button
             id="closeTunerBtn"
             class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">
-
             ×
-
         </button>
 
         <h2 class="text-3xl font-black text-center mb-6 text-emerald-400">
             Guitar Tuner
         </h2>
 
-        <!-- NOTE -->
-        <div
-            id="tunerNote"
-            class="text-7xl font-black text-center text-white mb-2">
+        <div id="tunerNote" class="text-7xl font-black text-center text-white mb-2">--</div>
+        <div id="tunerFreq" class="text-center text-gray-400 text-lg mb-6">0 Hz</div>
 
-            --
-
-        </div>
-
-        <!-- FREQ -->
-        <div
-            id="tunerFreq"
-            class="text-center text-gray-400 text-lg mb-6">
-
-            0 Hz
-
-        </div>
-
-        <!-- TARGET STRING -->
         <div class="text-center mb-4">
-
-            <div class="text-gray-400 uppercase text-sm">
-                Closest String
-            </div>
-
-            <div
-                id="closestString"
-                class="text-3xl font-bold text-emerald-400">
-
-                --
-
-            </div>
-
+            <div class="text-gray-400 uppercase text-sm">Closest String</div>
+            <div id="closestString" class="text-3xl font-bold text-emerald-400">--</div>
         </div>
 
-        <!-- TUNING STATUS -->
-        <div
-            id="tuningStatus"
-            class="text-center text-2xl font-bold text-yellow-400 mb-6">
+        <div id="tuningStatus" class="text-center text-2xl font-bold text-yellow-400 mb-6">Waiting...</div>
 
-            Waiting...
-
-        </div>
-
-        <!-- TUNING BAR -->
         <div class="w-full h-4 bg-slate-700 rounded-full overflow-hidden relative">
-
             <div
                 id="tuningNeedle"
                 class="absolute top-0 left-1/2 w-2 h-4 bg-emerald-400 transition-all duration-100"
                 style="transform: translateX(-50%);">
             </div>
-
         </div>
 
-        <!-- STANDARD TUNING -->
         <div class="grid grid-cols-6 gap-2 mt-8 text-center">
-
-            <div>E</div>
-            <div>A</div>
-            <div>D</div>
-            <div>G</div>
-            <div>B</div>
-            <div>E</div>
-
+            <div>E</div><div>A</div><div>D</div><div>G</div><div>B</div><div>E</div>
         </div>
-
     </div>
-
 </div>
-
 
 <script>
 
 //////////////////////////////////////////////////////////
 // SECURITY CHECK
 //////////////////////////////////////////////////////////
-
-if (
-    location.protocol !== "https:" &&
-    location.hostname !== "localhost" &&
-    location.hostname !== "127.0.0.1"
-) {
-    alert(
-        "Microphone requires HTTPS or localhost.\n\n" +
-        "Upload to GitHub Pages or use local server."
-    );
+if (location.protocol !== "https:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+    alert("Microphone requires HTTPS or localhost.\n\nUpload to GitHub Pages or use local server.");
 }
 
 //////////////////////////////////////////////////////////
 // CHORD DATABASE
 //////////////////////////////////////////////////////////
-
 const chordDb = {
-
     // MAJOR
     "C Maj": { positions:[0,1,0,2,3,-1], rootNote:"C" },
     "C# Maj": { positions:[4,6,6,6,4,-1], rootNote:"C#" },
@@ -430,602 +325,149 @@ const chordDb = {
     "G5": { positions:[-1,-1,-1,5,5,3], rootNote:"G" },
     "A5": { positions:[-1,-1,2,2,0,-1], rootNote:"A" },
     "B5": { positions:[-1,-1,4,4,2,-1], rootNote:"B" }
-
 };
 
 const chordKeys = Object.keys(chordDb);
-
 let currentChordIndex = 0;
 
 //////////////////////////////////////////////////////////
 // CHORD SELECTOR
 //////////////////////////////////////////////////////////
-
 const chordSelect = document.getElementById("chordSelect");
-
 chordSelect.innerHTML = "";
-
 Object.keys(chordDb).forEach(chord => {
-
     const option = document.createElement("option");
-
     option.value = chord;
-
     option.textContent = chord;
-
     chordSelect.appendChild(option);
-
 });
 
 chordSelect.addEventListener("change", () => {
-
     const chordName = chordSelect.value;
-
     currentChordIndex = chordKeys.indexOf(chordName);
-
     drawFretboard(chordName);
-
 });
 
 //////////////////////////////////////////////////////////
 // AUDIO ENGINE
 //////////////////////////////////////////////////////////
-
 let audioContext;
 let analyser;
 let isListening = false;
 
 async function startAudio() {
-
     if (isListening) return;
-
     try {
-
-        // CREATE AUDIO CONTEXT
-        audioContext =
-            new (window.AudioContext || window.webkitAudioContext)();
-
-        // IMPORTANT FOR ANDROID
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
         await audioContext.resume();
 
-        // GET MICROPHONE
-        const stream =
-            await navigator.mediaDevices.getUserMedia({
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1, sampleRate: 48000 }
+        });
 
-                audio: {
-
-                    echoCancellation: false,
-                    noiseSuppression: false,
-                    autoGainControl: false,
-                    channelCount: 1,
-                    sampleRate: 48000
-
-                }
-
-            });
-
-        // SOURCE
-        const source =
-            audioContext.createMediaStreamSource(stream);
-
-        // ANALYSER
+        const source = audioContext.createMediaStreamSource(stream);
         analyser = audioContext.createAnalyser();
-
         analyser.fftSize = 4096;
-
         source.connect(analyser);
-
         isListening = true;
 
-        // UI UPDATE
-        document.getElementById("micBtn").innerText =
-            "🎙️ Listening";
+        document.getElementById("micBtn").innerText = "🎙️ Listening";
+        document.getElementById("micBtn").classList.replace("bg-blue-600", "bg-red-500");
+        document.getElementById("statusText").innerText = "Microphone active";
+        document.getElementById("statusDot").classList.add("status-active");
 
-        document.getElementById("micBtn")
-            .classList.replace("bg-blue-600", "bg-red-500");
-
-        document.getElementById("statusText").innerText =
-            "Microphone active";
-
-        document.getElementById("statusDot")
-            .classList.add("status-active");
-
-        // START LOOP
         detectPitch();
-
     } catch (err) {
-
         console.error(err);
-
-        alert(
-            "Microphone failed.\n\n" +
-            "1. Allow mic permission\n" +
-            "2. Reload page\n" +
-            "3. Use HTTPS\n" +
-            "4. Try Chrome if Opera fails"
-        );
+        alert("Microphone failed.\n\n1. Allow mic permission\n2. Reload page\n3. Use HTTPS\n4. Try Chrome if Opera fails");
     }
 }
-
-document.getElementById("micBtn")
-    .addEventListener("click", startAudio);
+document.getElementById("micBtn").addEventListener("click", startAudio);
 
 //////////////////////////////////////////////////////////
 // AUTOCORRELATION
 //////////////////////////////////////////////////////////
-
 function autoCorrelate(buffer, sampleRate) {
-
     let SIZE = buffer.length;
-
     let rms = 0;
-
-    for (let i = 0; i < SIZE; i++) {
-
-        rms += buffer[i] * buffer[i];
-
-    }
-
+    for (let i = 0; i < SIZE; i++) rms += buffer[i] * buffer[i];
     rms = Math.sqrt(rms / SIZE);
 
-    // LOWERED FOR PHONE MICS
-    if (rms < 0.01) return -1;
+    if (rms < 0.01) return -1; // Noise gate
 
-    let r1 = 0;
-    let r2 = SIZE - 1;
-    let threshold = 0.2;
-
+    let r1 = 0, r2 = SIZE - 1, threshold = 0.2;
     for (let i = 0; i < SIZE / 2; i++) {
-
-        if (Math.abs(buffer[i]) < threshold) {
-
-            r1 = i;
-            break;
-        }
+        if (Math.abs(buffer[i]) < threshold) { r1 = i; break; }
     }
-
     for (let i = 1; i < SIZE / 2; i++) {
-
-        if (Math.abs(buffer[SIZE - i]) < threshold) {
-
-            r2 = SIZE - i;
-            break;
-        }
+        if (Math.abs(buffer[SIZE - i]) < threshold) { r2 = SIZE - i; break; }
     }
 
     buffer = buffer.slice(r1, r2);
-
     SIZE = buffer.length;
-
     const c = new Array(SIZE).fill(0);
-
     for (let i = 0; i < SIZE; i++) {
-
-        for (let j = 0; j < SIZE - i; j++) {
-
-            c[i] += buffer[j] * buffer[j + i];
-
-        }
+        for (let j = 0; j < SIZE - i; j++) c[i] += buffer[j] * buffer[j + i];
     }
 
     let d = 0;
-
     while (c[d] > c[d + 1]) d++;
-
-    let maxValue = -1;
-    let maxPosition = -1;
-
+    let maxValue = -1, maxPosition = -1;
     for (let i = d; i < SIZE; i++) {
-
-        if (c[i] > maxValue) {
-
-            maxValue = c[i];
-            maxPosition = i;
-
-        }
+        if (c[i] > maxValue) { maxValue = c[i]; maxPosition = i; }
     }
-
-    const T0 = maxPosition;
-
-    return sampleRate / T0;
+    return sampleRate / maxPosition;
 }
 
 //////////////////////////////////////////////////////////
 // FREQUENCY -> NOTE
 //////////////////////////////////////////////////////////
-
-const noteStrings = [
-
-    "C","C#","D","D#","E","F",
-    "F#","G","G#","A","A#","B"
-
-];
-
+const noteStrings = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 function frequencyToNote(freq) {
-
-    const noteNum =
-        12 * (Math.log(freq / 440) / Math.log(2));
-
-    const midi =
-        Math.round(noteNum) + 69;
-
+    const noteNum = 12 * (Math.log(freq / 440) / Math.log(2));
+    const midi = Math.round(noteNum) + 69;
     return noteStrings[midi % 12];
 }
 
 //////////////////////////////////////////////////////////
 // DETECT LOOP
 //////////////////////////////////////////////////////////
-
 function detectPitch() {
-
     if (!isListening) return;
 
-    const buffer =
-        new Float32Array(analyser.fftSize);
-
+    const buffer = new Float32Array(analyser.fftSize);
     analyser.getFloatTimeDomainData(buffer);
-
-    const pitch =
-        autoCorrelate(buffer, audioContext.sampleRate);
+    const pitch = autoCorrelate(buffer, audioContext.sampleRate);
 
     if (pitch !== -1 && pitch > 50 && pitch < 1200) {
+        const note = frequencyToNote(pitch);
+        updateTuner(pitch, note);
+        document.getElementById("detectedNoteDisplay").innerText = note;
+        document.getElementById("frequencyDisplay").innerText = pitch.toFixed(2) + " Hz";
 
-        const note =
-            frequencyToNote(pitch);
-            updateTuner(pitch, note);
-        document.getElementById("detectedNoteDisplay")
-            .innerText = note;
-
-        document.getElementById("frequencyDisplay")
-            .innerText = pitch.toFixed(2) + " Hz";
-
-        const targetRoot =
-            chordDb[chordKeys[currentChordIndex]].rootNote;
-
-        if (note === targetRoot) {
-
-            document.getElementById("glow").style.opacity = "0.2";
-
-        } else {
-
-            document.getElementById("glow").style.opacity = "0";
+        if (requiredNotes.includes(note)) {
+            if (!hitNotes.has(note)) {
+                hitNotes.add(note);
+                updateNotesUI();
+            }
         }
 
+        if (hitNotes.size === requiredNotes.length && requiredNotes.length > 0) {
+            document.getElementById("glow").style.opacity = "0.3";
+        } else {
+            document.getElementById("glow").style.opacity = "0";
+        }
     } else {
-
         document.getElementById("glow").style.opacity = "0";
     }
-
     requestAnimationFrame(detectPitch);
 }
 
-//////////////////////////////////////////////////////////
-// DRAW FRETBOARD
-//////////////////////////////////////////////////////////
-
-function drawFretboard(chordName) {
-
-    const chord = chordDb[chordName];
-
-	calculateChordNotes(chordName);
-
-    const fingersGroup =
-        document.getElementById("fingers");
-
-    fingersGroup.innerHTML = "";
-
-    document.getElementById("targetChordDisplay")
-        .innerText = chordName;
-
-    chord.positions.forEach((fret, stringIndex) => {
-
-        const yPos = 25 + (stringIndex * 30);
-
-        if (fret > 0) {
-
-            const fretWidth = 146;
-
-            const xPos =
-                50 + (fret * fretWidth) - (fretWidth / 2);
-
-            const circle =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "circle"
-                );
-
-            circle.setAttribute("cx", xPos);
-            circle.setAttribute("cy", yPos);
-            circle.setAttribute("r", "12");
-            circle.setAttribute("class", "finger");
-
-            fingersGroup.appendChild(circle);
-
-        }
-
-        else if (fret === -1) {
-
-            const text =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "text"
-                );
-
-            text.setAttribute("x", "20");
-            text.setAttribute("y", yPos + 6);
-
-            text.setAttribute("fill", "#ef4444");
-
-            text.setAttribute("font-size", "20");
-
-            text.setAttribute("font-weight", "bold");
-
-            text.textContent = "X";
-
-            fingersGroup.appendChild(text);
-        }
-    });
-}
-
-//////////////////////////////////////////////////////////
-// NEXT CHORD
-//////////////////////////////////////////////////////////
-
-function nextChord() {
-
-    currentChordIndex =
-        (currentChordIndex + 1) % chordKeys.length;
-
-    chordSelect.value =
-        chordKeys[currentChordIndex];
-
-    drawFretboard(chordKeys[currentChordIndex]);
-}
-//////////////////////////////////////////////////////////
-// TUNER SYSTEM
-//////////////////////////////////////////////////////////
-
-const tunerModal =
-    document.getElementById("tunerModal");
-
-document.getElementById("openTunerBtn")
-    .addEventListener("click", () => {
-
-        tunerModal.classList.remove("hidden");
-
-        tunerModal.classList.add("flex");
-
-});
-
-document.getElementById("closeTunerBtn")
-    .addEventListener("click", () => {
-
-        tunerModal.classList.add("hidden");
-
-        tunerModal.classList.remove("flex");
-
-});
-
-//////////////////////////////////////////////////////////
-// STANDARD GUITAR TUNING
-//////////////////////////////////////////////////////////
-
-const guitarStrings = [
-
-    { note: "E", freq: 82.41 },
-    { note: "A", freq: 110.00 },
-    { note: "D", freq: 146.83 },
-    { note: "G", freq: 196.00 },
-    { note: "B", freq: 246.94 },
-    { note: "E", freq: 329.63 }
-
-];
-
-//////////////////////////////////////////////////////////
-// FIND CLOSEST STRING
-//////////////////////////////////////////////////////////
-
-function getClosestString(freq) {
-
-    let closest = guitarStrings[0];
-
-    let minDiff = Infinity;
-
-    guitarStrings.forEach(string => {
-
-        const diff =
-            Math.abs(freq - string.freq);
-
-        if (diff < minDiff) {
-
-            minDiff = diff;
-
-            closest = string;
-
-        }
-
-    });
-
-    return closest;
-}
-
-//////////////////////////////////////////////////////////
-// CENTS DIFFERENCE
-//////////////////////////////////////////////////////////
-
-function getCents(freq, targetFreq) {
-
-    return 1200 *
-        Math.log2(freq / targetFreq);
-
-}
-
-//////////////////////////////////////////////////////////
-// UPDATE TUNER UI
-//////////////////////////////////////////////////////////
-
-function updateTuner(freq, note) {
-
-    if (!tunerModal.classList.contains("flex"))
-        return;
-
-    const closest =
-        getClosestString(freq);
-
-    const cents =
-        getCents(freq, closest.freq);
-
-    document.getElementById("tunerNote")
-        .innerText = note;
-
-    document.getElementById("tunerFreq")
-        .innerText = freq.toFixed(2) + " Hz";
-
-    document.getElementById("closestString")
-        .innerText = closest.note;
-
-    const needle =
-        document.getElementById("tuningNeedle");
-
-    let pos =
-        Math.max(-50, Math.min(50, cents));
-
-    needle.style.left =
-        (50 + pos / 2) + "%";
-
-    const status =
-        document.getElementById("tuningStatus");
-
-    if (Math.abs(cents) < 5) {
-
-        status.innerText = "IN TUNE";
-
-        status.className =
-            "text-center text-2xl font-bold text-emerald-400 mb-6";
-
-    }
-
-    else if (cents < 0) {
-
-        status.innerText = "TOO LOW";
-
-        status.className =
-            "text-center text-2xl font-bold text-yellow-400 mb-6";
-
-    }
-
-    else {
-
-        status.innerText = "TOO HIGH";
-
-        status.className =
-            "text-center text-2xl font-bold text-red-400 mb-6";
-
-    }
-}
-
-    
-//////////////////////////////////////////////////////////
-// INIT
-//////////////////////////////////////////////////////////
-
-drawFretboard(chordKeys[0]);
-
-
-//////////////////////////////////////////////////////////
-// CHORD SYNTHESIZER
-//////////////////////////////////////////////////////////
-
-// Standard tuning frequencies (High E to Low E) matches your string order
-const stringBaseFreqs = [329.63, 246.94, 196.00, 146.83, 110.00, 82.41];
-
-function playCurrentChord() {
-    if (!audioContext) {
-        // Initialize if user hasn't clicked the Mic button yet
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
-    const currentChordName = chordKeys[currentChordIndex];
-    const positions = chordDb[currentChordName].positions;
-
-    positions.forEach((fret, stringIndex) => {
-        // Skip muted strings (-1)
-        if (fret === -1) return;
-
-        // Calculate exact frequency: base_freq * 2^(fret/12)
-        const freq = stringBaseFreqs[stringIndex] * Math.pow(2, fret / 12);
-
-        // Create oscillator (sound source) and gain node (volume control)
-        const osc = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-
-        osc.type = 'triangle'; // Sounds a bit softer/plucky than a raw sine wave
-        osc.frequency.value = freq;
-
-        osc.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        // Envelope: Quick attack, smooth fade out to simulate a string ring
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        // Stagger the start times slightly to simulate a "strum" (0.03s between strings)
-        const strumOffset = stringIndex * 0.03; 
-        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + strumOffset + 0.05);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + strumOffset + 2.0);
-
-        osc.start(audioContext.currentTime + strumOffset);
-        osc.stop(audioContext.currentTime + strumOffset + 2.0);
-    });
-}
-
-//////////////////////////////////////////////////////////
-// DRILL MODE
-//////////////////////////////////////////////////////////
-
-let drillInterval;
-let isDrilling = false;
-
-function toggleDrill() {
-    const drillBtn = document.getElementById("drillBtn");
-    
-    if (isDrilling) {
-        // Stop the drill
-        clearInterval(drillInterval);
-        isDrilling = false;
-        drillBtn.innerHTML = "⏱️ Start Drill";
-        drillBtn.classList.replace("bg-red-500", "bg-purple-600");
-    } else {
-        // Start the drill
-        isDrilling = true;
-        drillBtn.innerHTML = "🛑 Stop Drill";
-        drillBtn.classList.replace("bg-purple-600", "bg-red-500");
-        
-        // Pick a random chord immediately, then every 4 seconds
-        pickRandomChord();
-        drillInterval = setInterval(pickRandomChord, 4000);
-    }
-}
-
-function pickRandomChord() {
-    // Prevent picking the exact same chord twice in a row
-    let newIndex;
-    do {
-        newIndex = Math.floor(Math.random() * chordKeys.length);
-    } while (newIndex === currentChordIndex && chordKeys.length > 1);
-    
-    currentChordIndex = newIndex;
-    const newChord = chordKeys[currentChordIndex];
-    
-    chordSelect.value = newChord;
-    drawFretboard(newChord);
-}
 
 //////////////////////////////////////////////////////////
 // CHORD NOTE CALCULATOR
 //////////////////////////////////////////////////////////
-
-// MIDI numbers for standard tuning open strings (High E down to Low E)
 const stringBaseMidi = [64, 59, 55, 50, 45, 40]; 
-
 let requiredNotes = [];
 let hitNotes = new Set();
 
@@ -1034,13 +476,12 @@ function calculateChordNotes(chordName) {
     const notes = new Set();
     
     positions.forEach((fret, stringIndex) => {
-        if (fret !== -1) { // Ignore muted strings
+        if (fret !== -1) { 
             const midiNote = stringBaseMidi[stringIndex] + fret;
             notes.add(noteStrings[midiNote % 12]);
         }
     });
     
-    // Convert Set to Array and store globally
     requiredNotes = Array.from(notes);
     hitNotes.clear();
     updateNotesUI();
@@ -1053,17 +494,296 @@ function updateNotesUI() {
     requiredNotes.forEach(note => {
         const noteSpan = document.createElement("span");
         noteSpan.innerText = note;
-        
         if (hitNotes.has(note)) {
             noteSpan.className = "text-emerald-400 scale-125 transition-transform";
         } else {
             noteSpan.className = "text-gray-600 transition-colors";
         }
-        
         container.appendChild(noteSpan);
     });
 }
-</script>
 
+//////////////////////////////////////////////////////////
+// DRAW FRETBOARD (DYNAMIC SHIFTING)
+//////////////////////////////////////////////////////////
+function drawFretboard(chordName) {
+    const chord = chordDb[chordName];
+    calculateChordNotes(chordName);
+
+    const fingersGroup = document.getElementById("fingers");
+    const fretsGroup = document.getElementById("frets");
+    const markersGroup = document.getElementById("markers");
+
+    // Clear previous drawing
+    fingersGroup.innerHTML = "";
+    fretsGroup.innerHTML = "";
+    markersGroup.innerHTML = "";
+
+    document.getElementById("targetChordDisplay").innerText = chordName;
+
+    // 1. CALCULATE FRET WINDOW
+    const fretsUsed = chord.positions.filter(f => f > 0);
+    const minFret = fretsUsed.length > 0 ? Math.min(...fretsUsed) : 1;
+    const maxFret = fretsUsed.length > 0 ? Math.max(...fretsUsed) : 5;
+
+    let startFret = 1;
+    if (maxFret > 5) {
+        startFret = minFret;
+    }
+
+    const fretWidth = 146;
+
+    // 2. DRAW FRETS
+    for (let i = 0; i <= 5; i++) {
+        const x = 50 + (i * fretWidth);
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x);
+        line.setAttribute("y1", "20");
+        line.setAttribute("x2", x);
+        line.setAttribute("y2", "180");
+        
+        if (i === 0 && startFret === 1) {
+            line.setAttribute("class", "nut");
+        } else {
+            line.setAttribute("class", "fret");
+        }
+        fretsGroup.appendChild(line);
+    }
+
+    // 3. DRAW FRET LABEL (e.g. "5fr" if shifted)
+    if (startFret > 1) {
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", "15");
+        text.setAttribute("y", "18");
+        text.setAttribute("fill", "#94a3b8"); 
+        text.setAttribute("font-size", "14");
+        text.setAttribute("font-weight", "bold");
+        text.textContent = startFret + "fr";
+        fretsGroup.appendChild(text);
+    }
+
+    // 4. DRAW INLAY MARKERS
+    const singleMarkers = [3, 5, 7, 9, 15, 17, 19, 21];
+    for (let i = 0; i < 5; i++) {
+        const actualFret = startFret + i;
+        const cx = 50 + ((i + 1) * fretWidth) - (fretWidth / 2);
+        
+        if (singleMarkers.includes(actualFret)) {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", cx);
+            circle.setAttribute("cy", "100");
+            circle.setAttribute("r", "8");
+            circle.setAttribute("fill", "#475569");
+            markersGroup.appendChild(circle);
+        } else if (actualFret === 12 || actualFret === 24) {
+            const c1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            c1.setAttribute("cx", cx);
+            c1.setAttribute("cy", "70");
+            c1.setAttribute("r", "8");
+            c1.setAttribute("fill", "#475569");
+            
+            const c2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            c2.setAttribute("cx", cx);
+            c2.setAttribute("cy", "130");
+            c2.setAttribute("r", "8");
+            c2.setAttribute("fill", "#475569");
+            
+            markersGroup.appendChild(c1);
+            markersGroup.appendChild(c2);
+        }
+    }
+
+    // 5. DRAW FINGERS & MUTED/OPEN STRINGS
+    chord.positions.forEach((fret, stringIndex) => {
+        const yPos = 25 + (stringIndex * 30);
+
+        if (fret > 0) {
+            const relativeFret = fret - startFret + 1;
+            if (relativeFret > 0 && relativeFret <= 5) {
+                const xPos = 50 + (relativeFret * fretWidth) - (fretWidth / 2);
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", xPos);
+                circle.setAttribute("cy", yPos);
+                circle.setAttribute("r", "12");
+                circle.setAttribute("class", "finger");
+                fingersGroup.appendChild(circle);
+            }
+        } else if (fret === -1) {
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("x", "20");
+            text.setAttribute("y", yPos + 6);
+            text.setAttribute("fill", "#ef4444");
+            text.setAttribute("font-size", "20");
+            text.setAttribute("font-weight", "bold");
+            text.textContent = "X";
+            fingersGroup.appendChild(text);
+        } else if (fret === 0) {
+             const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+             text.setAttribute("x", "20");
+             text.setAttribute("y", yPos + 6);
+             text.setAttribute("fill", "#10b981");
+             text.setAttribute("font-size", "20");
+             text.setAttribute("font-weight", "bold");
+             text.textContent = "O";
+             fingersGroup.appendChild(text);
+        }
+    });
+}
+
+//////////////////////////////////////////////////////////
+// NEXT CHORD
+//////////////////////////////////////////////////////////
+function nextChord() {
+    currentChordIndex = (currentChordIndex + 1) % chordKeys.length;
+    chordSelect.value = chordKeys[currentChordIndex];
+    drawFretboard(chordKeys[currentChordIndex]);
+}
+
+//////////////////////////////////////////////////////////
+// TUNER SYSTEM
+//////////////////////////////////////////////////////////
+const tunerModal = document.getElementById("tunerModal");
+document.getElementById("openTunerBtn").addEventListener("click", () => {
+    tunerModal.classList.remove("hidden");
+    tunerModal.classList.add("flex");
+});
+document.getElementById("closeTunerBtn").addEventListener("click", () => {
+    tunerModal.classList.add("hidden");
+    tunerModal.classList.remove("flex");
+});
+
+const guitarStrings = [
+    { note: "E", freq: 82.41 },
+    { note: "A", freq: 110.00 },
+    { note: "D", freq: 146.83 },
+    { note: "G", freq: 196.00 },
+    { note: "B", freq: 246.94 },
+    { note: "E", freq: 329.63 }
+];
+
+function getClosestString(freq) {
+    let closest = guitarStrings[0];
+    let minDiff = Infinity;
+    guitarStrings.forEach(string => {
+        const diff = Math.abs(freq - string.freq);
+        if (diff < minDiff) { minDiff = diff; closest = string; }
+    });
+    return closest;
+}
+
+function getCents(freq, targetFreq) {
+    return 1200 * Math.log2(freq / targetFreq);
+}
+
+function updateTuner(freq, note) {
+    if (!tunerModal.classList.contains("flex")) return;
+
+    const closest = getClosestString(freq);
+    const cents = getCents(freq, closest.freq);
+
+    document.getElementById("tunerNote").innerText = note;
+    document.getElementById("tunerFreq").innerText = freq.toFixed(2) + " Hz";
+    document.getElementById("closestString").innerText = closest.note;
+
+    const needle = document.getElementById("tuningNeedle");
+    let pos = Math.max(-50, Math.min(50, cents));
+    needle.style.left = (50 + pos / 2) + "%";
+
+    const status = document.getElementById("tuningStatus");
+    if (Math.abs(cents) < 5) {
+        status.innerText = "IN TUNE";
+        status.className = "text-center text-2xl font-bold text-emerald-400 mb-6";
+    } else if (cents < 0) {
+        status.innerText = "TOO LOW";
+        status.className = "text-center text-2xl font-bold text-yellow-400 mb-6";
+    } else {
+        status.innerText = "TOO HIGH";
+        status.className = "text-center text-2xl font-bold text-red-400 mb-6";
+    }
+}
+
+//////////////////////////////////////////////////////////
+// CHORD SYNTHESIZER
+//////////////////////////////////////////////////////////
+const stringBaseFreqs = [329.63, 246.94, 196.00, 146.83, 110.00, 82.41];
+function playCurrentChord() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    const currentChordName = chordKeys[currentChordIndex];
+    const positions = chordDb[currentChordName].positions;
+
+    positions.forEach((fret, stringIndex) => {
+        if (fret === -1) return;
+        const freq = stringBaseFreqs[stringIndex] * Math.pow(2, fret / 12);
+        const osc = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        osc.type = 'triangle'; 
+        osc.frequency.value = freq;
+        osc.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        const strumOffset = stringIndex * 0.03; 
+        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + strumOffset + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + strumOffset + 2.0);
+
+        osc.start(audioContext.currentTime + strumOffset);
+        osc.stop(audioContext.currentTime + strumOffset + 2.0);
+    });
+}
+
+//////////////////////////////////////////////////////////
+// DRILL MODE
+//////////////////////////////////////////////////////////
+let drillInterval;
+let isDrilling = false;
+
+function toggleDrill() {
+    const drillBtn = document.getElementById("drillBtn");
+    const speedSelect = document.getElementById("drillSpeed");
+    
+    if (isDrilling) {
+        clearInterval(drillInterval);
+        isDrilling = false;
+        drillBtn.innerHTML = "⏱️ Start Drill";
+        drillBtn.classList.replace("bg-red-500", "bg-purple-600");
+        speedSelect.disabled = false;
+        speedSelect.classList.remove("opacity-50");
+    } else {
+        isDrilling = true;
+        drillBtn.innerHTML = "🛑 Stop Drill";
+        drillBtn.classList.replace("bg-purple-600", "bg-red-500");
+        speedSelect.disabled = true;
+        speedSelect.classList.add("opacity-50");
+        
+        const intervalMs = parseInt(speedSelect.value, 10);
+        pickRandomChord();
+        drillInterval = setInterval(pickRandomChord, intervalMs);
+    }
+}
+
+function pickRandomChord() {
+    let newIndex;
+    do {
+        newIndex = Math.floor(Math.random() * chordKeys.length);
+    } while (newIndex === currentChordIndex && chordKeys.length > 1);
+    
+    currentChordIndex = newIndex;
+    const newChord = chordKeys[currentChordIndex];
+    chordSelect.value = newChord;
+    drawFretboard(newChord);
+}
+
+//////////////////////////////////////////////////////////
+// INIT
+//////////////////////////////////////////////////////////
+// MUST BE AT THE BOTTOM!
+drawFretboard(chordKeys[0]);
+
+</script>
 </body>
 </html>
+
+```
