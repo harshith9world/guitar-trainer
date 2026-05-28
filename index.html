@@ -100,6 +100,13 @@
                 
                 🎸 Tuner
             </button>
+			
+			<button
+				id="drillBtn"
+				onclick="toggleDrill()"
+				class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all">
+				⏱️ Start Drill
+			</button>
             
         </div>
 
@@ -130,7 +137,13 @@
                 Next Chord
 
             </button>
-
+			
+			<button
+				id="playChordBtn"
+				onclick="playCurrentChord()"
+				class="w-full mt-3 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg transition font-semibold text-white">
+				🔊 Play Chord
+			</button>
         </div>
 
         <!-- DETECTION -->
@@ -551,7 +564,7 @@ function autoCorrelate(buffer, sampleRate) {
     rms = Math.sqrt(rms / SIZE);
 
     // LOWERED FOR PHONE MICS
-    if (rms < 0.003) return -1;
+    if (rms < 0.01) return -1;
 
     let r1 = 0;
     let r2 = SIZE - 1;
@@ -911,6 +924,93 @@ function updateTuner(freq, note) {
 
 drawFretboard(chordKeys[0]);
 
+
+//////////////////////////////////////////////////////////
+// CHORD SYNTHESIZER
+//////////////////////////////////////////////////////////
+
+// Standard tuning frequencies (High E to Low E) matches your string order
+const stringBaseFreqs = [329.63, 246.94, 196.00, 146.83, 110.00, 82.41];
+
+function playCurrentChord() {
+    if (!audioContext) {
+        // Initialize if user hasn't clicked the Mic button yet
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    const currentChordName = chordKeys[currentChordIndex];
+    const positions = chordDb[currentChordName].positions;
+
+    positions.forEach((fret, stringIndex) => {
+        // Skip muted strings (-1)
+        if (fret === -1) return;
+
+        // Calculate exact frequency: base_freq * 2^(fret/12)
+        const freq = stringBaseFreqs[stringIndex] * Math.pow(2, fret / 12);
+
+        // Create oscillator (sound source) and gain node (volume control)
+        const osc = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        osc.type = 'triangle'; // Sounds a bit softer/plucky than a raw sine wave
+        osc.frequency.value = freq;
+
+        osc.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        // Envelope: Quick attack, smooth fade out to simulate a string ring
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        // Stagger the start times slightly to simulate a "strum" (0.03s between strings)
+        const strumOffset = stringIndex * 0.03; 
+        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + strumOffset + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + strumOffset + 2.0);
+
+        osc.start(audioContext.currentTime + strumOffset);
+        osc.stop(audioContext.currentTime + strumOffset + 2.0);
+    });
+}
+
+//////////////////////////////////////////////////////////
+// DRILL MODE
+//////////////////////////////////////////////////////////
+
+let drillInterval;
+let isDrilling = false;
+
+function toggleDrill() {
+    const drillBtn = document.getElementById("drillBtn");
+    
+    if (isDrilling) {
+        // Stop the drill
+        clearInterval(drillInterval);
+        isDrilling = false;
+        drillBtn.innerHTML = "⏱️ Start Drill";
+        drillBtn.classList.replace("bg-red-500", "bg-purple-600");
+    } else {
+        // Start the drill
+        isDrilling = true;
+        drillBtn.innerHTML = "🛑 Stop Drill";
+        drillBtn.classList.replace("bg-purple-600", "bg-red-500");
+        
+        // Pick a random chord immediately, then every 4 seconds
+        pickRandomChord();
+        drillInterval = setInterval(pickRandomChord, 4000);
+    }
+}
+
+function pickRandomChord() {
+    // Prevent picking the exact same chord twice in a row
+    let newIndex;
+    do {
+        newIndex = Math.floor(Math.random() * chordKeys.length);
+    } while (newIndex === currentChordIndex && chordKeys.length > 1);
+    
+    currentChordIndex = newIndex;
+    const newChord = chordKeys[currentChordIndex];
+    
+    chordSelect.value = newChord;
+    drawFretboard(newChord);
+}
 </script>
 
 </body>
