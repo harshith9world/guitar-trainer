@@ -101,12 +101,21 @@
                 🎸 Tuner
             </button>
 			
-			<button
-				id="drillBtn"
-				onclick="toggleDrill()"
-				class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all">
-				⏱️ Start Drill
-			</button>
+			<div class="flex gap-2">
+                <select id="drillSpeed" class="bg-slate-700 text-white border border-slate-600 rounded-xl px-3 outline-none cursor-pointer">
+                    <option value="10000">Beginner (10s)</option>
+                    <option value="8000">Novice (8s)</option>
+                    <option value="6000">Intermediate (6s)</option>
+                    <option value="3500">Expert (3.5s)</option>
+                </select>
+
+                <button
+                    id="drillBtn"
+                    onclick="toggleDrill()"
+                    class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all whitespace-nowrap">
+                    ⏱️ Start Drill
+                </button>
+            </div>
             
         </div>
 
@@ -981,6 +990,7 @@ let isDrilling = false;
 
 function toggleDrill() {
     const drillBtn = document.getElementById("drillBtn");
+    const speedSelect = document.getElementById("drillSpeed");
     
     if (isDrilling) {
         // Stop the drill
@@ -988,15 +998,22 @@ function toggleDrill() {
         isDrilling = false;
         drillBtn.innerHTML = "⏱️ Start Drill";
         drillBtn.classList.replace("bg-red-500", "bg-purple-600");
+        speedSelect.disabled = false; // Re-enable the dropdown
+        speedSelect.classList.remove("opacity-50");
     } else {
         // Start the drill
         isDrilling = true;
         drillBtn.innerHTML = "🛑 Stop Drill";
         drillBtn.classList.replace("bg-purple-600", "bg-red-500");
+        speedSelect.disabled = true; // Lock the dropdown while drilling
+        speedSelect.classList.add("opacity-50");
         
-        // Pick a random chord immediately, then every 4 seconds
+        // Get the selected speed in milliseconds
+        const intervalMs = parseInt(speedSelect.value, 10);
+        
+        // Pick a random chord immediately, then repeat based on selection
         pickRandomChord();
-        drillInterval = setInterval(pickRandomChord, 4000);
+        drillInterval = setInterval(pickRandomChord, intervalMs);
     }
 }
 
