@@ -168,6 +168,11 @@
                 0 Hz
 
             </div>
+			
+			<div
+				id="chordNotesDisplay"
+				class="flex gap-2 mt-4 z-10 font-bold text-xl">
+            </div>
 
             <!-- STATUS -->
             <div class="flex items-center gap-2 mt-4 z-10">
@@ -413,7 +418,7 @@ const chordDb = {
     "Dsus2": { positions:[0,3,2,0,-1,-1], rootNote:"D" },
     "Dsus4": { positions:[3,3,2,0,-1,-1], rootNote:"D" },
     "Esus4": { positions:[0,0,2,2,2,0], rootNote:"E" },
-    "Gsus4": { positions:[1,0,0,0,3,3], rootNote:"G" },
+    "Gsus4": { positions:[3,1,0,0,3,3], rootNote:"G" },
     "Asus2": { positions:[0,0,2,2,0,-1], rootNote:"A" },
     "Asus4": { positions:[0,3,2,2,0,-1], rootNote:"A" },
 
@@ -421,8 +426,8 @@ const chordDb = {
     "C5": { positions:[-1,-1,5,5,3,-1], rootNote:"C" },
     "D5": { positions:[-1,-1,7,7,5,-1], rootNote:"D" },
     "E5": { positions:[-1,-1,9,9,7,0], rootNote:"E" },
-    "F5": { positions:[-1,-1,10,10,8,1], rootNote:"F" },
-    "G5": { positions:[-1,-1,0,0,2,3], rootNote:"G" },
+    "F5": { positions:[-1,-1,-1,3,3,1], rootNote:"F" },
+    "G5": { positions:[-1,-1,-1,5,5,3], rootNote:"G" },
     "A5": { positions:[-1,-1,2,2,0,-1], rootNote:"A" },
     "B5": { positions:[-1,-1,4,4,2,-1], rootNote:"B" }
 
@@ -647,47 +652,42 @@ function frequencyToNote(freq) {
     return noteStrings[midi % 12];
 }
 
+
 //////////////////////////////////////////////////////////
-// DETECT LOOP
+// DETECT LOOP (ARPEGGIO MODE)
 //////////////////////////////////////////////////////////
 
 function detectPitch() {
-
     if (!isListening) return;
 
-    const buffer =
-        new Float32Array(analyser.fftSize);
-
+    const buffer = new Float32Array(analyser.fftSize);
     analyser.getFloatTimeDomainData(buffer);
 
-    const pitch =
-        autoCorrelate(buffer, audioContext.sampleRate);
+    const pitch = autoCorrelate(buffer, audioContext.sampleRate);
 
     if (pitch !== -1 && pitch > 50 && pitch < 1200) {
+        const note = frequencyToNote(pitch);
+        updateTuner(pitch, note);
+        
+        document.getElementById("detectedNoteDisplay").innerText = note;
+        document.getElementById("frequencyDisplay").innerText = pitch.toFixed(2) + " Hz";
 
-        const note =
-            frequencyToNote(pitch);
-            updateTuner(pitch, note);
-        document.getElementById("detectedNoteDisplay")
-            .innerText = note;
+        // If the detected note is part of the chord, add it to our hits
+        if (requiredNotes.includes(note)) {
+            if (!hitNotes.has(note)) {
+                hitNotes.add(note);
+                updateNotesUI();
+            }
+        }
 
-        document.getElementById("frequencyDisplay")
-            .innerText = pitch.toFixed(2) + " Hz";
-
-        const targetRoot =
-            chordDb[chordKeys[currentChordIndex]].rootNote;
-
-        if (note === targetRoot) {
-
-            document.getElementById("glow").style.opacity = "0.2";
-
+        // Check for Win Condition: Did they hit all required notes?
+        if (hitNotes.size === requiredNotes.length && requiredNotes.length > 0) {
+            document.getElementById("glow").style.opacity = "0.3";
         } else {
-
             document.getElementById("glow").style.opacity = "0";
         }
 
     } else {
-
         document.getElementById("glow").style.opacity = "0";
     }
 
@@ -701,6 +701,8 @@ function detectPitch() {
 function drawFretboard(chordName) {
 
     const chord = chordDb[chordName];
+	
+	calculateChordNotes(chordName);
 
     const fingersGroup =
         document.getElementById("fingers");
@@ -1010,6 +1012,51 @@ function pickRandomChord() {
     
     chordSelect.value = newChord;
     drawFretboard(newChord);
+}
+
+//////////////////////////////////////////////////////////
+// CHORD NOTE CALCULATOR
+//////////////////////////////////////////////////////////
+
+// MIDI numbers for standard tuning open strings (High E down to Low E)
+const stringBaseMidi = [64, 59, 55, 50, 45, 40]; 
+
+let requiredNotes = [];
+let hitNotes = new Set();
+
+function calculateChordNotes(chordName) {
+    const positions = chordDb[chordName].positions;
+    const notes = new Set();
+    
+    positions.forEach((fret, stringIndex) => {
+        if (fret !== -1) { // Ignore muted strings
+            const midiNote = stringBaseMidi[stringIndex] + fret;
+            notes.add(noteStrings[midiNote % 12]);
+        }
+    });
+    
+    // Convert Set to Array and store globally
+    requiredNotes = Array.from(notes);
+    hitNotes.clear();
+    updateNotesUI();
+}
+
+function updateNotesUI() {
+    const container = document.getElementById("chordNotesDisplay");
+    container.innerHTML = "";
+    
+    requiredNotes.forEach(note => {
+        const noteSpan = document.createElement("span");
+        noteSpan.innerText = note;
+        
+        if (hitNotes.has(note)) {
+            noteSpan.className = "text-emerald-400 scale-125 transition-transform";
+        } else {
+            noteSpan.className = "text-gray-600 transition-colors";
+        }
+        
+        container.appendChild(noteSpan);
+    });
 }
 </script>
 
