@@ -731,9 +731,7 @@ function drawFretboard(chordName) {
     document.getElementById("targetChordDisplay")
         .innerText = chordName;
 
-    [...chord.positions]
-	.reverse()
-	.forEach((fret, stringIndex) => {
+    chord.positions.forEach((fret, stringIndex) => {
 
         const yPos =
 			25 + (stringIndex * 30);
